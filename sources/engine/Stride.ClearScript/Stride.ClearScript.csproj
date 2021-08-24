@@ -1,0 +1,28 @@
+
+<Project>
+	<PropertyGroup>
+		<StrideRuntime>true</StrideRuntime>
+	</PropertyGroup>
+	<Import Project="..\..\targets\Stride.props" />
+	<PropertyGroup>
+		<StrideAssemblyProcessor>true</StrideAssemblyProcessor>
+		<StridePlatformDependent>true</StridePlatformDependent>
+		<StrideBuildTags>*</StrideBuildTags>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="..\..\shared\SharedAssemblyInfo.cs">
+			<Link>Properties\SharedAssemblyInfo.cs</Link>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.ClearScript" Version="7.1.5" />
+		<PackageReference Include="Mono.Options" Version="5.3.0.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Stride.Engine\Stride.Engine.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+	</ItemGroup>
+	<Import Project="$(StrideSdkTargets)" />
+</Project>

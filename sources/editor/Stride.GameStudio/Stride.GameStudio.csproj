@@ -32,6 +32,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.ClearScript" Version="7.1.5" />
     <PackageReference Include="ServiceWire" Version="5.3.4" />
     <PackageReference Include="SharpDX" Version="4.2.0" />
     <PackageReference Include="Stride.Metrics" Version="1.0.3" />
