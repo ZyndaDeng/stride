@@ -19,13 +19,13 @@ namespace Stride.ClearScript
 
     
 
-    public class JavaScriptSystem : ComponentBase, IGameSystemBase,IJavaScriptSystem
+    public class ClearScriptSystem : ComponentBase, IGameSystemBase,IClearScriptSystem
     {
         protected V8ScriptEngine engine;
 
         public IServiceRegistry Services { get; private set; }
         public ContentManager Content { get; private set; }
-        public JavaScriptSystem(IServiceRegistry registry)
+        public ClearScriptSystem(IServiceRegistry registry)
             : base()
         {
             Services = registry;
@@ -56,6 +56,11 @@ namespace Stride.ClearScript
             ");
         }
 
+        public object Evaluate(string code)
+        {
+            return engine.Evaluate(code);
+        }
+
         public async Task loadFile(string fileName)
         {
             using (var stream = VirtualFileSystem.OpenStream(fileName, VirtualFileMode.Open, VirtualFileAccess.Read))
@@ -78,6 +83,19 @@ namespace Stride.ClearScript
             }
         }
 
-       
+        public object CreatePromiseForTask<T>(Task<T> task)
+        {
+            return engine.CreatePromiseForTask(task);
+        }
+
+        public object CreatePromiseForTask(Task task)
+        {
+            return engine.CreatePromiseForTask(task);
+        }
+
+        public Task<object> CreateTaskForPromise(object promise)
+        {
+            return engine.CreateTaskForPromise(promise);
+        }
     }
 }
