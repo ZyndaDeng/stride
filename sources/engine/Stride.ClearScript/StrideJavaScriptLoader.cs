@@ -21,8 +21,6 @@ namespace Stride.ClearScript
             yield return element;
         }
 
-        
-
         public static IEnumerable<string> ExcludeIndices(this IEnumerable<string> names)
         {
             foreach (var name in names)
@@ -71,7 +69,7 @@ namespace Stride.ClearScript
             }
         }
     }
-        internal class StrideJavaScriptLoader : DocumentLoader
+    internal class StrideJavaScriptLoader : DocumentLoader
     {
         private static readonly IReadOnlyCollection<string> relativePrefixes = new List<string>
             {
@@ -136,14 +134,14 @@ namespace Stride.ClearScript
         private async Task<bool> IsCandidateUriAsync(DocumentSettings settings, Uri uri)
         {
             return uri.IsFile ?
-                settings.AccessFlags.HasFlag(DocumentAccessFlags.EnableFileLoading) && await FileDocumentExistsAsync(uri.LocalPath).ConfigureAwait(false) :
+                settings.AccessFlags.HasFlag(DocumentAccessFlags.EnableFileLoading) && await FileDocumentExistsAsync(uri.AbsolutePath).ConfigureAwait(false) :
                 settings.AccessFlags.HasFlag(DocumentAccessFlags.EnableWebLoading) && await WebDocumentExistsAsync(uri).ConfigureAwait(false);
         }
 
         private Task<bool> FileDocumentExistsAsync(string path)
         {
             Interlocked.Increment(ref fileCheckCount);
-            return Task.FromResult(File.Exists(path));
+            return Task.FromResult(VirtualFileSystem.FileExists(path));
         }
 
         private Task<bool> WebDocumentExistsAsync(Uri uri)
@@ -205,14 +203,15 @@ namespace Stride.ClearScript
             //    yield return uri;
             //}
 
-            using (var process = Process.GetCurrentProcess())
-            {
-                var module = process.MainModule;
-                if ((module != null) && Uri.TryCreate(module.FileName, UriKind.Absolute, out baseUri) && Uri.TryCreate(baseUri, specifier, out uri))
-                {
-                    yield return uri;
-                }
-            }
+            
+            //using (var process = Process.GetCurrentProcess())
+            //{
+            //    var module = process.MainModule;
+            //    if ((module != null) && Uri.TryCreate(module.FileName, UriKind.Absolute, out baseUri) && Uri.TryCreate(baseUri, specifier, out uri))
+            //    {
+            //        yield return uri;
+            //    }
+            //}
         }
 
         private static IEnumerable<Uri> ApplyExtensions(DocumentInfo? sourceInfo, Uri uri, string extensions)
@@ -323,10 +322,9 @@ namespace Stride.ClearScript
 
             if (uri.IsFile)
             {
-                using (var reader = new StreamReader(uri.LocalPath))
-                {
-                    contents = await reader.ReadToEndAsync().ConfigureAwait(false);
-                }
+                using var stream = VirtualFileSystem.OpenStream(uri.AbsolutePath, VirtualFileMode.Open, VirtualFileAccess.Read);
+                using var streamReader = new StreamReader(stream);
+                contents = await streamReader.ReadToEndAsync();
             }
             else
             {

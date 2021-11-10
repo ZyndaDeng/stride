@@ -31,28 +31,28 @@ namespace Stride.ClearScript
     [AllowMultipleComponents]
     [ComponentOrder(1000)]
     [ComponentCategory("ClearScripts")]
-    public class ClearScriptComponent: EntityComponent, ICollectorHolder 
-    { 
-         public const uint LiveScriptingMask = 128;
+    public class ClearScriptComponent : EntityComponent, ICollectorHolder
+    {
+        public const uint LiveScriptingMask = 128;
 
-    /// <summary>
-    /// The global profiling key for scripts. Activate/deactivate this key to activate/deactivate profiling for all your scripts.
-    /// </summary>
-    public static readonly ProfilingKey ScriptGlobalProfilingKey = new ProfilingKey("Script");
+        /// <summary>
+        /// The global profiling key for scripts. Activate/deactivate this key to activate/deactivate profiling for all your scripts.
+        /// </summary>
+        public static readonly ProfilingKey ScriptGlobalProfilingKey = new ProfilingKey("Script");
 
-    private static readonly Dictionary<Type, ProfilingKey> ScriptToProfilingKey = new Dictionary<Type, ProfilingKey>();
+        private static readonly Dictionary<Type, ProfilingKey> ScriptToProfilingKey = new Dictionary<Type, ProfilingKey>();
 
-    private ProfilingKey profilingKey;
+        private ProfilingKey profilingKey;
 
-    //private IGraphicsDeviceService graphicsDeviceService;
-    private Logger logger;
+        //private IGraphicsDeviceService graphicsDeviceService;
+        private Logger logger;
 
         private dynamic scriptObj;
 
-    protected ClearScriptComponent()
-    {
-            
-    }
+        protected ClearScriptComponent()
+        {
+
+        }
 
         internal void Initialize(IServiceRegistry registry)
         {
@@ -80,120 +80,124 @@ namespace Stride.ClearScript
                 };
                 scriptObj.Initialize(args);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
             }
-            
-    }
+
+        }
 
         protected Entity entity;
-        public Entity Entity { get=>entity; internal set {
+        public Entity Entity
+        {
+            get => entity; internal set
+            {
                 entity = value;
                 scriptObj.Entity = value;
-            } }
+            }
+        }
 
         /// <summary>
         /// Gets the profiling key to activate/deactivate profiling for the current script class.
         /// </summary>
         [DataMemberIgnore]
-    public ProfilingKey ProfilingKey
-    {
-        get
+        public ProfilingKey ProfilingKey
         {
-            if (profilingKey != null)
-                return profilingKey;
-
-            var scriptType = GetType();
-            if (!ScriptToProfilingKey.TryGetValue(scriptType, out profilingKey))
+            get
             {
-                profilingKey = new ProfilingKey(ScriptGlobalProfilingKey, scriptType.FullName);
-                ScriptToProfilingKey[scriptType] = profilingKey;
+                if (profilingKey != null)
+                    return profilingKey;
+
+                var scriptType = GetType();
+                if (!ScriptToProfilingKey.TryGetValue(scriptType, out profilingKey))
+                {
+                    profilingKey = new ProfilingKey(ScriptGlobalProfilingKey, scriptType.FullName);
+                    ScriptToProfilingKey[scriptType] = profilingKey;
+                }
+
+                return profilingKey;
             }
-
-            return profilingKey;
         }
-    }
 
-    
 
-    /// <summary>
-    /// Gets the streaming system.
-    /// </summary>
-    /// <value>The streaming system.</value>
-    [DataMemberIgnore]
-    public StreamingManager Streaming { get; private set; }
+
+        /// <summary>
+        /// Gets the streaming system.
+        /// </summary>
+        /// <value>The streaming system.</value>
+        [DataMemberIgnore]
+        public StreamingManager Streaming { get; private set; }
 
         [DataMemberIgnore]
         public IClearScriptSystem ScriptSystem { get; private set; }
 
         [DataMemberIgnore]
-    protected Logger Log
-    {
-        get
+        protected Logger Log
         {
-            if (logger != null)
+            get
             {
+                if (logger != null)
+                {
+                    return logger;
+                }
+
+                var className = GetType().FullName;
+                logger = GlobalLogger.GetLogger(className);
                 return logger;
             }
-
-            var className = GetType().FullName;
-            logger = GlobalLogger.GetLogger(className);
-            return logger;
         }
-    }
 
-    private int priority;
+        private int priority;
 
-    /// <summary>
-    /// The priority this script will be scheduled with (compared to other scripts).
-    /// </summary>
-    /// <userdoc>The execution priority for this script. It applies to async, sync and startup scripts. Lower values mean earlier execution.</userdoc>
-    [DefaultValue(0)]
-    [DataMember(10000)]
-    public int Priority
-    {
-        get { return priority; }
-        set { priority = value; PriorityUpdated(); }
-    }
-
-    /// <summary>
-    /// Determines whether the script is currently undergoing live reloading.
-    /// </summary>
-    public bool IsLiveReloading { get; internal set; }
-
-    /// <summary>
-    /// The object collector associated with this script.
-    /// </summary>
-    [DataMemberIgnore]
-    public ObjectCollector Collector
-    {
-        get
+        /// <summary>
+        /// The priority this script will be scheduled with (compared to other scripts).
+        /// </summary>
+        /// <userdoc>The execution priority for this script. It applies to async, sync and startup scripts. Lower values mean earlier execution.</userdoc>
+        [DefaultValue(0)]
+        [DataMember(10000)]
+        public int Priority
         {
-            collector.EnsureValid();
-            return collector;
+            get { return priority; }
+            set { priority = value; PriorityUpdated(); }
         }
-    }
 
-    private ObjectCollector collector;
+        /// <summary>
+        /// Determines whether the script is currently undergoing live reloading.
+        /// </summary>
+        public bool IsLiveReloading { get; internal set; }
 
-    
+        /// <summary>
+        /// The object collector associated with this script.
+        /// </summary>
+        [DataMemberIgnore]
+        public ObjectCollector Collector
+        {
+            get
+            {
+                collector.EnsureValid();
+                return collector;
+            }
+        }
 
-    /// <summary>
-    /// Called when the script's update loop is canceled.
-    /// </summary>
-    public void Cancel()
-    {
-        scriptObj.Cancel();
-        collector.Dispose();
-    }
+        private ObjectCollector collector;
 
-    public void Start()
+
+
+        /// <summary>
+        /// Called when the script's update loop is canceled.
+        /// </summary>
+        public void Cancel()
+        {
+            scriptObj.Cancel();
+            collector.Dispose();
+        }
+
+        public void Start()
         {
             scriptObj.Start();
         }
 
-        internal PriorityQueueNode<SchedulerEntry> UpdateSchedulerNode;
+       // internal PriorityQueueNode<SchedulerEntry> UpdateSchedulerNode;
 
         public bool hasProperty(string propertyName)
         {
@@ -204,7 +208,7 @@ namespace Stride.ClearScript
         /// <summary>
         /// Called every frame.
         /// </summary>
-        public  void Update()
+        public void Update()
         {
             scriptObj.Update();
         }
@@ -224,10 +228,10 @@ namespace Stride.ClearScript
         /// Called once, as a microthread
         /// </summary>
         /// <returns></returns>
-        public  Task Execute()
-        {
+        //public Task Execute()
+        //{
 
-        }
+        //}
 
         protected internal void PriorityUpdated()
         {

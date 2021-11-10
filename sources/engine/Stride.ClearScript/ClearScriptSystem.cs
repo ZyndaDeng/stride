@@ -45,7 +45,7 @@ namespace Stride.ClearScript
             engine.DocumentSettings.Loader = loader;
             engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableFileLoading;
 
-            engine.AddHostType("Console", typeof(Console));
+            engine.AddHostType("MSConsole", typeof(Console));
         }
 
         public object Execute()
@@ -70,11 +70,12 @@ namespace Stride.ClearScript
                 try
                 {
                     string source = await streamReader.ReadToEndAsync();
+                    var path = Path.GetDirectoryName(fileName)+Path.DirectorySeparatorChar;
+                    var doc = new DocumentInfo(new Uri(@"\\js"+path));
                     
-                 var script=   engine.Evaluate(new DocumentInfo (){ 
-                        Category = ModuleCategory.Standard 
-                    }, source);
-                    Console.WriteLine("------javascript c={0}", script.c);
+                    doc.Category = ModuleCategory.Standard;
+                    var script = engine.Evaluate(doc, source); 
+                   // Console.WriteLine("------javascript c={0}", script.c);
                 }catch(Exception e)
                 {
                     Console.WriteLine(e.Message);
@@ -83,19 +84,19 @@ namespace Stride.ClearScript
             }
         }
 
-        public object CreatePromiseForTask<T>(Task<T> task)
-        {
-            return engine.CreatePromiseForTask(task);
-        }
+        //public object CreatePromiseForTask<T>(Task<T> task)
+        //{
+        //    return engine.CreatePromiseForTask(task);
+        //}
 
-        public object CreatePromiseForTask(Task task)
-        {
-            return engine.CreatePromiseForTask(task);
-        }
+        //public object CreatePromiseForTask(Task task)
+        //{
+        //    return engine.CreatePromiseForTask(task);
+        //}
 
-        public Task<object> CreateTaskForPromise(object promise)
-        {
-            return engine.CreateTaskForPromise(promise);
-        }
+        //public Task<object> CreateTaskForPromise(object promise)
+        //{
+        //    return engine.CreateTaskForPromise(promise);
+        //}
     }
 }

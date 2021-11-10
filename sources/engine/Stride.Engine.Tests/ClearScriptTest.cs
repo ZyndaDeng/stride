@@ -22,7 +22,8 @@ namespace Stride.Engine.Tests
 
             scriptSystem = new ClearScriptSystem(Services);
             scriptSystem.Initialize();
-            scriptSystem.loadFile("/local/src/main.js");
+            scriptSystem.loadFile("/local/src/demo/testModule.js");
+            //scriptSystem.loadFile("//local/src/modules/add.js");
 
         }
 
@@ -32,7 +33,8 @@ namespace Stride.Engine.Tests
 
             scriptSystem = new ClearScriptSystem(Services);
             scriptSystem.Initialize();
-            scriptSystem.loadFile("/local/src/main.js");
+            //scriptSystem.loadFile("/local/src/main.js");
+            scriptSystem.loadFile("//local/src/modules/add.js");
         }
 
         [Fact]
