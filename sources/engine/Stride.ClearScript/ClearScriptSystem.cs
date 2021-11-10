@@ -48,39 +48,30 @@ namespace Stride.ClearScript
             engine.AddHostType("MSConsole", typeof(Console));
         }
 
-        public object Execute()
-        {
-           return engine.Evaluate(new DocumentInfo { Category = ModuleCategory.Standard }, @"
-                import * as Arithmetic from 'JavaScript/StandardModule/Arithmetic/Arithmetic.js';
-                Arithmetic.Add(123, 456);
-            ");
-        }
 
         public object Evaluate(string code)
         {
-            return engine.Evaluate(code);
+            return engine.Evaluate(new DocumentInfo { Category = ModuleCategory.Standard }, code);
         }
 
         public async Task loadFile(string fileName)
         {
-            using (var stream = VirtualFileSystem.OpenStream(fileName, VirtualFileMode.Open, VirtualFileAccess.Read))
-            using (var streamReader = new StreamReader(stream))
+            using var stream = VirtualFileSystem.OpenStream(fileName, VirtualFileMode.Open, VirtualFileAccess.Read);
+            using var streamReader = new StreamReader(stream);
+            //read the raw asset content
+            try
             {
-                //read the raw asset content
-                try
-                {
-                    string source = await streamReader.ReadToEndAsync();
-                    var path = Path.GetDirectoryName(fileName)+Path.DirectorySeparatorChar;
-                    var doc = new DocumentInfo(new Uri(@"\\js"+path));
-                    
-                    doc.Category = ModuleCategory.Standard;
-                    var script = engine.Evaluate(doc, source); 
-                   // Console.WriteLine("------javascript c={0}", script.c);
-                }catch(Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-                
+                string source = await streamReader.ReadToEndAsync();
+                var path = Path.GetDirectoryName(fileName) + Path.DirectorySeparatorChar;
+                var doc = new DocumentInfo(new Uri(@"\\js" + path));
+
+                doc.Category = ModuleCategory.Standard;
+                var script = engine.Evaluate(doc, source);
+                // Console.WriteLine("------javascript c={0}", script.c);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 
