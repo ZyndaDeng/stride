@@ -8,7 +8,7 @@
 //using Stride.Core.MicroThreading;
 //using Stride.Games;
 
-//namespace Stride.ClearScript.Processors
+//namespace Stride.Engine.Processors
 //{
 //    public sealed class ClearScriptSystem : GameSystemBase
 //    {
@@ -160,7 +160,7 @@
 //            scriptsToStart.Add(script);
 
 //            // If it's a synchronous script, add it to the list as well
-//           // var syncScript = script;//as SyncScript;
+//            // var syncScript = script;//as SyncScript;
 //            if (script.hasProperty("Update"))
 //            {
 //                script.UpdateSchedulerNode = Scheduler.Create(script.Update, script.Priority | UpdateBit);
