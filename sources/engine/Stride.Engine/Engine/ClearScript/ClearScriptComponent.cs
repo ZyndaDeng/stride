@@ -50,6 +50,7 @@ namespace Stride.Engine
         private Logger logger;
 
         protected dynamic scriptObj;
+        protected string scriptCtorName;
 
         protected ClearScriptComponent()
         {
@@ -62,7 +63,7 @@ namespace Stride.Engine
             {
                 var Services = registry;
                 ScriptVM = Services.GetSafeServiceAs<IClearScriptVM>();
-                scriptObj = ScriptVM.Evaluate("new TestScript()");
+                scriptObj = ScriptVM.createComponentScript(scriptCtorName);
 
                 dynamic args = new
                 {

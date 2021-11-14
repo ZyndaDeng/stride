@@ -10,7 +10,7 @@ namespace Stride.ClearScript
     public interface IClearScriptVM
     {
         object Evaluate(string code);
-
+        object createComponentScript(string name);
         //object CreatePromiseForTask<T>(Task<T> task);
         //object CreatePromiseForTask(Task task);
 

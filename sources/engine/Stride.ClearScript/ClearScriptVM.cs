@@ -39,6 +39,24 @@ namespace Stride.ClearScript
             return engine.Evaluate(new DocumentInfo { Category = ModuleCategory.Standard }, code);
         }
 
+        public object createComponentScript(string name)
+        {
+            try
+            {
+                var ret = Evaluate("new __Stride.Components." + name + "()");
+                return ret;
+            }catch(Exception e)
+            {
+                return null;
+            }
+        }
+
+        public void loadSrc(string path)
+        {
+            var scriptFiles = VirtualFileSystem.ListFiles(path, "*" + engine.DocumentSettings.FileNameExtensions, VirtualSearchOption.AllDirectories).Result;
+
+        }
+
         public async Task loadFile(string fileName)
         {
             using var stream = VirtualFileSystem.OpenStream(fileName, VirtualFileMode.Open, VirtualFileAccess.Read);
