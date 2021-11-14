@@ -27,11 +27,11 @@ namespace Stride.Engine.Processors
         /// <summary>
         /// Contains all currently executed scripts
         /// </summary>
-        private readonly HashSet<ScriptComponent> registeredScripts = new HashSet<ScriptComponent>();
-        private readonly HashSet<ScriptComponent> scriptsToStart = new HashSet<ScriptComponent>();
-        private readonly HashSet<SyncScript> syncScripts = new HashSet<SyncScript>();
-        private readonly List<ScriptComponent> scriptsToStartCopy = new List<ScriptComponent>();
-        private readonly List<SyncScript> syncScriptsCopy = new List<SyncScript>();
+        private readonly HashSet<IScriptComponent> registeredScripts = new HashSet<IScriptComponent>();
+        private readonly HashSet<IScriptComponent> scriptsToStart = new HashSet<IScriptComponent>();
+        private readonly HashSet<ISyncScript> syncScripts = new HashSet<ISyncScript>();
+        private readonly List<IScriptComponent> scriptsToStartCopy = new List<IScriptComponent>();
+        private readonly List<ISyncScript> syncScriptsCopy = new List<ISyncScript>();
 
         /// <summary>
         /// Gets the scheduler.
@@ -74,7 +74,7 @@ namespace Stride.Engine.Processors
             foreach (var script in scriptsToStartCopy)
             {
                 // Start the script
-                var startupScript = script as StartupScript;
+                var startupScript = script as IStartupScript;
                 if (startupScript != null)
                 {
                     startupScript.StartSchedulerNode = Scheduler.Add(startupScript.Start, startupScript.Priority, startupScript, startupScript.ProfilingKey);
@@ -109,7 +109,7 @@ namespace Stride.Engine.Processors
             foreach (var script in scriptsToStartCopy)
             {
                 // Remove the start node after it got executed
-                var startupScript = script as StartupScript;
+                var startupScript = script as IStartupScript;
                 if (startupScript != null)
                 {
                     startupScript.StartSchedulerNode = null;
@@ -159,7 +159,7 @@ namespace Stride.Engine.Processors
         /// Add the provided script to the script system.
         /// </summary>
         /// <param name="script">The script to add</param>
-        public void Add(ScriptComponent script)
+        public void Add(IScriptComponent script)
         {
             script.Initialize(Services);
             registeredScripts.Add(script);
@@ -168,8 +168,8 @@ namespace Stride.Engine.Processors
             scriptsToStart.Add(script);
 
             // If it's a synchronous script, add it to the list as well
-            var syncScript = script as SyncScript;
-            if (syncScript != null)
+            var syncScript = script as ISyncScript;
+            if (syncScript != null&&syncScript.ShouldUpdate)
             {
                 syncScript.UpdateSchedulerNode = Scheduler.Create(syncScript.Update, syncScript.Priority | UpdateBit);
                 syncScript.UpdateSchedulerNode.Value.Token = syncScript;
@@ -182,7 +182,7 @@ namespace Stride.Engine.Processors
         /// Remove the provided script from the script system.
         /// </summary>
         /// <param name="script">The script to remove</param>
-        public void Remove(ScriptComponent script)
+        public void Remove(IScriptComponent script)
         {
             // Make sure it's not registered in any pending list
             var startWasPending = scriptsToStart.Remove(script);
@@ -205,7 +205,7 @@ namespace Stride.Engine.Processors
             }
 
             // Remove script from the scheduler, in case it was removed during scheduler execution
-            var startupScript = script as StartupScript;
+            var startupScript = script as IStartupScript;
             if (startupScript != null)
             {
                 if (startupScript.StartSchedulerNode != null)
@@ -214,12 +214,15 @@ namespace Stride.Engine.Processors
                     startupScript.StartSchedulerNode = null;
                 }
 
-                var syncScript = script as SyncScript;
+                var syncScript = script as ISyncScript;
                 if (syncScript != null)
                 {
                     syncScripts.Remove(syncScript);
-                    Scheduler?.Unschedule(syncScript.UpdateSchedulerNode);
-                    syncScript.UpdateSchedulerNode = null;
+                    if (syncScript.UpdateSchedulerNode != null)
+                    {
+                        Scheduler?.Unschedule(syncScript.UpdateSchedulerNode);
+                        syncScript.UpdateSchedulerNode = null;
+                    } 
                 }
             }
         }
@@ -229,7 +232,7 @@ namespace Stride.Engine.Processors
         /// </summary>
         /// <param name="oldScript">The old script</param>
         /// <param name="newScript">The new script</param>
-        public void LiveReload(ScriptComponent oldScript, ScriptComponent newScript)
+        public void LiveReload(IScriptComponent oldScript, IScriptComponent newScript)
         {
             // Set live reloading mode for the rest of it's lifetime
             oldScript.IsLiveReloading = true;
@@ -240,10 +243,10 @@ namespace Stride.Engine.Processors
 
         private void Scheduler_ActionException(Scheduler scheduler, SchedulerEntry schedulerEntry, Exception e)
         {
-            HandleSynchronousException((ScriptComponent)schedulerEntry.Token, e);
+            HandleSynchronousException((IScriptComponent)schedulerEntry.Token, e);
         }
 
-        private void HandleSynchronousException(ScriptComponent script, Exception e)
+        private void HandleSynchronousException(IScriptComponent script, Exception e)
         {
             Log.Error("Unexpected exception while executing a script.", e);
 
@@ -261,11 +264,11 @@ namespace Stride.Engine.Processors
             registeredScripts.Remove(script);
         }
 
-        private class PriorityScriptComparer : IComparer<ScriptComponent>
+        private class PriorityScriptComparer : IComparer<IScriptComponent>
         {
             public static readonly PriorityScriptComparer Default = new PriorityScriptComparer();
 
-            public int Compare(ScriptComponent x, ScriptComponent y)
+            public int Compare(IScriptComponent x, IScriptComponent y)
             {
                 return x.Priority.CompareTo(y.Priority);
             }

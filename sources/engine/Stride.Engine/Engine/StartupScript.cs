@@ -3,12 +3,14 @@
 
 using Stride.Core.Collections;
 using Stride.Core.MicroThreading;
-
 namespace Stride.Engine
 {
-    public abstract class StartupScript : ScriptComponent
+    public abstract class StartupScript : ScriptComponent, IStartupScript
     {
-        internal PriorityQueueNode<SchedulerEntry> StartSchedulerNode;
+       // internal PriorityQueueNode<SchedulerEntry> StartSchedulerNode { get; set; }
+        PriorityQueueNode<SchedulerEntry> IStartupScript.StartSchedulerNode { get; set; }
+
+
 
         /// <summary>
         /// Called before the script enters it's update loop.
@@ -16,5 +18,7 @@ namespace Stride.Engine
         public virtual void Start()
         {
         }
+
+        
     }
 }

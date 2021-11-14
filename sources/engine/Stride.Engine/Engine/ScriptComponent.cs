@@ -29,7 +29,7 @@ namespace Stride.Engine
     [AllowMultipleComponents]
     [ComponentOrder(1000)]
     [ComponentCategory("Scripts")]
-    public abstract class ScriptComponent : EntityComponent, ICollectorHolder
+    public abstract class ScriptComponent : EntityComponent, ICollectorHolder,IScriptComponent
     {
         public const uint LiveScriptingMask = 128;
 
@@ -49,7 +49,26 @@ namespace Stride.Engine
         {
         }
 
-        internal void Initialize(IServiceRegistry registry)
+        //internal void Initialize(IServiceRegistry registry)
+        //{
+        //    Services = registry;
+
+        //    graphicsDeviceService = Services.GetSafeServiceAs<IGraphicsDeviceService>();
+
+        //    Game = Services.GetSafeServiceAs<IGame>();
+        //    Content = (ContentManager)Services.GetSafeServiceAs<IContentManager>();
+        //    Input = Services.GetSafeServiceAs<InputManager>();
+        //    Script = Services.GetSafeServiceAs<ScriptSystem>();
+        //    SceneSystem = Services.GetSafeServiceAs<SceneSystem>();
+        //    EffectSystem = Services.GetSafeServiceAs<EffectSystem>();
+        //    Audio = Services.GetSafeServiceAs<AudioSystem>();
+        //    SpriteAnimation = Services.GetSafeServiceAs<SpriteAnimationSystem>();
+        //    GameProfiler = Services.GetSafeServiceAs<GameProfilingSystem>();
+        //    DebugText = Services.GetSafeServiceAs<DebugTextSystem>();
+        //    Streaming = Services.GetSafeServiceAs<StreamingManager>();
+        //}
+
+        void IScriptComponent.Initialize(IServiceRegistry registry)
         {
             Services = registry;
 
@@ -166,7 +185,7 @@ namespace Stride.Engine
         /// <summary>
         /// Determines whether the script is currently undergoing live reloading.
         /// </summary>
-        public bool IsLiveReloading { get; internal set; }
+         bool IScriptComponent.IsLiveReloading { get;  set; }
 
         /// <summary>
         /// The object collector associated with this script.
@@ -180,6 +199,7 @@ namespace Stride.Engine
                 return collector;
             }
         }
+
 
         private ObjectCollector collector;
 
@@ -197,5 +217,7 @@ namespace Stride.Engine
         {
             collector.Dispose();
         }
+
+        
     }
 }

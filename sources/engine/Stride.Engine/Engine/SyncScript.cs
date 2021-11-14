@@ -9,9 +9,11 @@ namespace Stride.Engine
     /// <summary>
     /// A script whose <see cref="Update"/> will be called every frame.
     /// </summary>
-    public abstract class SyncScript : StartupScript
+    public abstract class SyncScript : StartupScript, ISyncScript
     {
-        internal PriorityQueueNode<SchedulerEntry> UpdateSchedulerNode;
+        PriorityQueueNode<SchedulerEntry> ISyncScript.UpdateSchedulerNode { get; set; }
+
+        bool ISyncScript.ShouldUpdate => true;
 
         /// <summary>
         /// Called every frame.

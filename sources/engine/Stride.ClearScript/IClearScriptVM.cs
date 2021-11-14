@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Stride.ClearScript
 {
-    public interface IClearScriptSystem
+    public interface IClearScriptVM
     {
         object Evaluate(string code);
 

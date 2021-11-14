@@ -3,41 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Stride.Core;
-using Stride.Games;
-using Stride.Core.Serialization.Contents;
-using Stride.Core.IO;
 using System.IO;
 using Microsoft.ClearScript.V8;
 using Microsoft.ClearScript;
-using System.Diagnostics;
-using System.Net;
 using Microsoft.ClearScript.JavaScript;
+using Stride.Core.IO;
 
 namespace Stride.ClearScript
 {
 
-    
-
-    public class ClearScriptSystem : ComponentBase, IGameSystemBase,IClearScriptSystem
+    public class ClearScriptVM : IClearScriptVM, IDisposable
     {
         protected V8ScriptEngine engine;
 
-        public IServiceRegistry Services { get; private set; }
-        public ContentManager Content { get; private set; }
-        public ClearScriptSystem(IServiceRegistry registry)
+       
+        public ClearScriptVM()
             : base()
         {
-            Services = registry;
-         
             
         }
 
-        protected override void Destroy()
-        {
-            if (engine != null) engine.Dispose();
-            base.Destroy();
-        }
         public void Initialize()
         {
             engine = new V8ScriptEngine();
@@ -73,6 +58,11 @@ namespace Stride.ClearScript
             {
                 Console.WriteLine(e.Message);
             }
+        }
+
+        public void Dispose()
+        {
+            if (engine != null) engine.Dispose();
         }
 
         //public object CreatePromiseForTask<T>(Task<T> task)

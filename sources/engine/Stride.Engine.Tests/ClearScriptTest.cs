@@ -14,13 +14,13 @@ namespace Stride.Engine.Tests
     public class ClearScriptTest : GameTestBase
     {
 
-        protected ClearScriptSystem scriptSystem;
+        protected ClearScriptVM scriptSystem;
         [Fact]
         public void Constructor1Tests()
         {
 
 
-            scriptSystem = new ClearScriptSystem(Services);
+            scriptSystem = new ClearScriptVM(Services);
             scriptSystem.Initialize();
             scriptSystem.loadFile("/local/src/demo/testModule.js");
             //scriptSystem.loadFile("//local/src/modules/add.js");
@@ -31,7 +31,7 @@ namespace Stride.Engine.Tests
         {
             await base.LoadContent();
 
-            scriptSystem = new ClearScriptSystem(Services);
+            scriptSystem = new ClearScriptVM(Services);
             scriptSystem.Initialize();
             //scriptSystem.loadFile("/local/src/main.js");
             scriptSystem.loadFile("//local/src/modules/add.js");
