@@ -8,22 +8,23 @@ using Microsoft.ClearScript.V8;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.JavaScript;
 using Stride.Core.IO;
+using Stride.Games;
+using Stride.Core;
 
 namespace Stride.ClearScript
 {
 
-    public class ClearScriptVM : IClearScriptVM, IDisposable
+    public class ClearScriptVM :  GameSystemBase, IClearScriptVM
     {
         protected V8ScriptEngine engine;
 
        
-        public ClearScriptVM()
-            : base()
+        public ClearScriptVM(IServiceRegistry registry) : base(registry)
         {
             
         }
 
-        public void Initialize()
+        public override void Initialize()
         {
             engine = new V8ScriptEngine();
             var loader = new StrideJavaScriptLoader();
@@ -43,7 +44,7 @@ namespace Stride.ClearScript
         {
             try
             {
-                var ret = Evaluate("new __Stride.Components." + name + "()");
+                var ret = Evaluate("new __Stride.Components." + name + ".ctor()");
                 return ret;
             }catch(Exception e)
             {
@@ -82,10 +83,12 @@ namespace Stride.ClearScript
             }
         }
 
-        public void Dispose()
+       
+        protected override void Destroy()
         {
             if (engine != null) engine.Dispose();
         }
+        
 
         //public object CreatePromiseForTask<T>(Task<T> task)
         //{

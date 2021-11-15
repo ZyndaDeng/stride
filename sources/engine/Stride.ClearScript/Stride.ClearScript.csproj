@@ -21,6 +21,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\core\Stride.Core.IO\Stride.Core.IO.csproj" />
 	  <ProjectReference Include="..\..\core\Stride.Core\Stride.Core.csproj" />
+	  <ProjectReference Include="..\Stride.Games\Stride.Games.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

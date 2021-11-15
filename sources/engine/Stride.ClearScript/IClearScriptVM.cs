@@ -11,6 +11,8 @@ namespace Stride.ClearScript
     {
         object Evaluate(string code);
         object createComponentScript(string name);
+        Task loadSrc(string path);
+        Task loadFile(string fileName);
         //object CreatePromiseForTask<T>(Task<T> task);
         //object CreatePromiseForTask(Task task);
 

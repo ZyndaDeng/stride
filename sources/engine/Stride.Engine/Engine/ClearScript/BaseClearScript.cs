@@ -12,6 +12,11 @@ namespace Stride.Engine
         PriorityQueueNode<SchedulerEntry> IStartupScript.StartSchedulerNode { get; set; }
         PriorityQueueNode<SchedulerEntry> ISyncScript.UpdateSchedulerNode { get; set; }
 
+        public BaseClearScript()
+        {
+            scriptCtorName = "Test";
+        }
+
         public void Start()
         {
             scriptObj?.Start();

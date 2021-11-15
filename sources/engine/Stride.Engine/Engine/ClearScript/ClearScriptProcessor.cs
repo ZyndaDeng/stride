@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Stride.ClearScript;
+using Stride.Core;
 using Stride.Engine.Processors;
+using Stride.Games;
 
 namespace Stride.Engine.ClearScript
 {
@@ -13,6 +12,7 @@ namespace Stride.Engine.ClearScript
     public sealed class ClearScriptProcessor : EntityProcessor<ClearScriptComponent>
     {
         private ScriptSystem scriptSystem;
+        private ClearScriptVM clearScriptVM;
 
         public ClearScriptProcessor()
         {
@@ -23,6 +23,20 @@ namespace Stride.Engine.ClearScript
         protected internal override void OnSystemAdd()
         {
             scriptSystem = Services.GetService<ScriptSystem>();
+            clearScriptVM = Services.GetService<ClearScriptVM>();
+            if (clearScriptVM == null)
+            {
+                clearScriptVM = new ClearScriptVM(Services);
+                var gameSystems = Services.GetSafeServiceAs<IGameSystemCollection>();
+                Services.AddService(clearScriptVM);
+                gameSystems.Add(clearScriptVM);
+                //clearScriptVM.loadFile("/roaming/src/bundle.js").ContinueWith((t) =>
+                //{
+                //    clearScriptVM.loadSrc("/roaming/src/components/");
+                //});
+                
+                 
+            }
         }
 
         /// <inheritdoc/>
