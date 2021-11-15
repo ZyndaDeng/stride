@@ -1,5 +1,6 @@
 
 
+
  declare interface IServiceRegistry{
 
     AddService<T>( service:T):void;

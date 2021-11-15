@@ -51,9 +51,13 @@ namespace Stride.ClearScript
             }
         }
 
-        public void loadSrc(string path)
+        public async Task loadSrc(string path)
         {
             var scriptFiles = VirtualFileSystem.ListFiles(path, "*" + engine.DocumentSettings.FileNameExtensions, VirtualSearchOption.AllDirectories).Result;
+            foreach(var file in scriptFiles)
+            {
+               await loadFile(file);
+            }
 
         }
 

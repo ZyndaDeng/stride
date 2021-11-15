@@ -1,0 +1,67 @@
+{
+  "bundle": {
+    "commonSourceDirectory": "../tsSrc",
+    "sourceFiles": [
+      "../tsSrc/Stride/Audio.ts",
+      "../tsSrc/Stride/ClearScript.ts",
+      "../tsSrc/Stride/Collection.ts",
+      "../tsSrc/Stride/Core.ts",
+      "../tsSrc/Stride/Design.ts",
+      "../tsSrc/Stride/Engine.ts",
+      "../tsSrc/Stride/Environment.ts",
+      "../tsSrc/Stride/Game.ts",
+      "../tsSrc/Stride/Graphics.ts",
+      "../tsSrc/Stride/Input.ts",
+      "../tsSrc/Stride/Profilling.ts",
+      "../tsSrc/Stride/Rendering.ts",
+      "../tsSrc/Stride/Utils.ts",
+      "../tsSrc/Stride/dotNet.ts",
+      "../tsSrc/Stride/Components/ClearScript.ts",
+      "../tsSrc/Stride/decorators/RegisterComponent.ts"
+    ],
+    "js": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 13,
+          "kind": "prologue",
+          "data": "use strict"
+        },
+        {
+          "pos": 15,
+          "end": 1825,
+          "kind": "text"
+        }
+      ],
+      "sources": {
+        "prologues": [
+          {
+            "file": 0,
+            "text": "",
+            "directives": [
+              {
+                "pos": -1,
+                "end": -1,
+                "expression": {
+                  "pos": -1,
+                  "end": -1,
+                  "text": "use strict"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dts": {
+      "sections": [
+        {
+          "pos": 0,
+          "end": 6598,
+          "kind": "text"
+        }
+      ]
+    }
+  },
+  "version": "3.8.3"
+}

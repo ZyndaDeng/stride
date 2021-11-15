@@ -1,5 +1,6 @@
 
 
+
 declare class EntityManager extends ComponentBase{
    readonly ExecutionMode:ExecutionMode
 }
