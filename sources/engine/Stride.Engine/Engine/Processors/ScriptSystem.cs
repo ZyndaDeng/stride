@@ -27,10 +27,10 @@ namespace Stride.Engine.Processors
         /// <summary>
         /// Contains all currently executed scripts
         /// </summary>
-        private readonly HashSet<IScriptComponent> registeredScripts = new HashSet<IScriptComponent>();
-        private readonly HashSet<IScriptComponent> scriptsToStart = new HashSet<IScriptComponent>();
+        private readonly HashSet<BaseScriptComponent> registeredScripts = new HashSet<BaseScriptComponent>();
+        private readonly HashSet<BaseScriptComponent> scriptsToStart = new HashSet<BaseScriptComponent>();
         private readonly HashSet<ISyncScript> syncScripts = new HashSet<ISyncScript>();
-        private readonly List<IScriptComponent> scriptsToStartCopy = new List<IScriptComponent>();
+        private readonly List<BaseScriptComponent> scriptsToStartCopy = new List<BaseScriptComponent>();
         private readonly List<ISyncScript> syncScriptsCopy = new List<ISyncScript>();
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Stride.Engine.Processors
                 var startupScript = script as IStartupScript;
                 if (startupScript != null)
                 {
-                    startupScript.StartSchedulerNode = Scheduler.Add(startupScript.Start, startupScript.Priority, startupScript, startupScript.ProfilingKey);
+                    startupScript.StartSchedulerNode = Scheduler.Add(startupScript.Start, script.Priority, startupScript, script.ProfilingKey);
                 }
                 else
                 {
@@ -94,9 +94,10 @@ namespace Stride.Engine.Processors
             // Schedule existing scripts: SyncScript.Update()
             foreach (var syncScript in syncScriptsCopy)
             {
+                var script = syncScript as BaseScriptComponent;
                 // Update priority
                 var updateSchedulerNode = syncScript.UpdateSchedulerNode;
-                updateSchedulerNode.Value.Priority = syncScript.Priority | UpdateBit;
+                updateSchedulerNode.Value.Priority = script.Priority | UpdateBit;
 
                 // Schedule
                 Scheduler.Schedule(updateSchedulerNode, ScheduleMode.Last);
@@ -159,7 +160,7 @@ namespace Stride.Engine.Processors
         /// Add the provided script to the script system.
         /// </summary>
         /// <param name="script">The script to add</param>
-        public void Add(IScriptComponent script)
+        public void Add(BaseScriptComponent script)
         {
             script.Initialize(Services);
             registeredScripts.Add(script);
@@ -171,9 +172,9 @@ namespace Stride.Engine.Processors
             var syncScript = script as ISyncScript;
             if (syncScript != null&&syncScript.ShouldUpdate)
             {
-                syncScript.UpdateSchedulerNode = Scheduler.Create(syncScript.Update, syncScript.Priority | UpdateBit);
+                syncScript.UpdateSchedulerNode = Scheduler.Create(syncScript.Update, script.Priority | UpdateBit);
                 syncScript.UpdateSchedulerNode.Value.Token = syncScript;
-                syncScript.UpdateSchedulerNode.Value.ProfilingKey = syncScript.ProfilingKey;
+                syncScript.UpdateSchedulerNode.Value.ProfilingKey = script.ProfilingKey;
                 syncScripts.Add(syncScript);
             }
         }
@@ -182,7 +183,7 @@ namespace Stride.Engine.Processors
         /// Remove the provided script from the script system.
         /// </summary>
         /// <param name="script">The script to remove</param>
-        public void Remove(IScriptComponent script)
+        public void Remove(BaseScriptComponent script)
         {
             // Make sure it's not registered in any pending list
             var startWasPending = scriptsToStart.Remove(script);
@@ -232,7 +233,7 @@ namespace Stride.Engine.Processors
         /// </summary>
         /// <param name="oldScript">The old script</param>
         /// <param name="newScript">The new script</param>
-        public void LiveReload(IScriptComponent oldScript, IScriptComponent newScript)
+        public void LiveReload(BaseScriptComponent oldScript, BaseScriptComponent newScript)
         {
             // Set live reloading mode for the rest of it's lifetime
             oldScript.IsLiveReloading = true;
@@ -243,10 +244,10 @@ namespace Stride.Engine.Processors
 
         private void Scheduler_ActionException(Scheduler scheduler, SchedulerEntry schedulerEntry, Exception e)
         {
-            HandleSynchronousException((IScriptComponent)schedulerEntry.Token, e);
+            HandleSynchronousException((BaseScriptComponent)schedulerEntry.Token, e);
         }
 
-        private void HandleSynchronousException(IScriptComponent script, Exception e)
+        private void HandleSynchronousException(BaseScriptComponent script, Exception e)
         {
             Log.Error("Unexpected exception while executing a script.", e);
 
@@ -264,11 +265,11 @@ namespace Stride.Engine.Processors
             registeredScripts.Remove(script);
         }
 
-        private class PriorityScriptComparer : IComparer<IScriptComponent>
+        private class PriorityScriptComparer : IComparer<BaseScriptComponent>
         {
             public static readonly PriorityScriptComparer Default = new PriorityScriptComparer();
 
-            public int Compare(IScriptComponent x, IScriptComponent y)
+            public int Compare(BaseScriptComponent x, BaseScriptComponent y)
             {
                 return x.Priority.CompareTo(y.Priority);
             }

@@ -33,32 +33,26 @@ namespace Stride.Engine
     [AllowMultipleComponents]
     [ComponentOrder(1001)]
     [ComponentCategory("ClearScripts")]
-    public abstract class ClearScriptComponent : EntityComponent, ICollectorHolder,IScriptComponent
+    public abstract class ClearScriptComponent : BaseScriptComponent
     {
-        public const uint LiveScriptingMask = 128;
-
+        
         /// <summary>
         /// The global profiling key for scripts. Activate/deactivate this key to activate/deactivate profiling for all your scripts.
         /// </summary>
-        public static readonly ProfilingKey ScriptGlobalProfilingKey = new ProfilingKey("Script");
+        public static readonly ProfilingKey ScriptGlobalProfilingKey = new ProfilingKey("ClearScript");
 
         private static readonly Dictionary<Type, ProfilingKey> ScriptToProfilingKey = new Dictionary<Type, ProfilingKey>();
 
-        private ProfilingKey profilingKey;
-
-        //private IGraphicsDeviceService graphicsDeviceService;
-        private Logger logger;
-
         protected dynamic scriptObj;
         protected string scriptCtorName;
-
         protected ClearScriptComponent()
         {
 
         }
 
-         void IScriptComponent.Initialize(IServiceRegistry registry)
+        internal override void  Initialize(IServiceRegistry registry)
         {
+            base.Initialize(registry);
             try
             {
                 var Services = registry;
@@ -91,21 +85,12 @@ namespace Stride.Engine
 
         }
 
-        //protected Entity entity;
-        //public Entity Entity
-        //{
-        //    get => entity; internal set
-        //    {
-        //        entity = value;
-        //        scriptObj.Entity = value;
-        //    }
-        //}
 
         /// <summary>
         /// Gets the profiling key to activate/deactivate profiling for the current script class.
         /// </summary>
         [DataMemberIgnore]
-        public ProfilingKey ProfilingKey
+        public override ProfilingKey ProfilingKey
         {
             get
             {
@@ -124,80 +109,21 @@ namespace Stride.Engine
         }
 
 
-
-        /// <summary>
-        /// Gets the streaming system.
-        /// </summary>
-        /// <value>The streaming system.</value>
-        [DataMemberIgnore]
-        public StreamingManager Streaming { get; private set; }
-
         [DataMemberIgnore]
         public IClearScriptVM ScriptVM { get; private set; }
 
-        [DataMemberIgnore]
-        protected Logger Log
-        {
-            get
-            {
-                if (logger != null)
-                {
-                    return logger;
-                }
-
-                var className = GetType().FullName;
-                logger = GlobalLogger.GetLogger(className);
-                return logger;
-            }
-        }
-
-        private int priority;
-
-        /// <summary>
-        /// The priority this script will be scheduled with (compared to other scripts).
-        /// </summary>
-        /// <userdoc>The execution priority for this script. It applies to async, sync and startup scripts. Lower values mean earlier execution.</userdoc>
-        [DefaultValue(0)]
-        [DataMember(10000)]
-        public int Priority
-        {
-            get { return priority; }
-            set { priority = value; PriorityUpdated(); }
-        }
-
-        /// <summary>
-        /// Determines whether the script is currently undergoing live reloading.
-        /// </summary>
-        bool IScriptComponent.IsLiveReloading { get; set; }
-
-        /// <summary>
-        /// The object collector associated with this script.
-        /// </summary>
-        [DataMemberIgnore]
-        public ObjectCollector Collector
-        {
-            get
-            {
-                collector.EnsureValid();
-                return collector;
-            }
-        }
-
-        private ObjectCollector collector;
-
-
+        
 
         /// <summary>
         /// Called when the script's update loop is canceled.
         /// </summary>
-        public void Cancel()
+        public override void Cancel()
         {
+
             scriptObj.Cancel();
-            collector.Dispose();
+            base.Cancel();
         }
 
-
-        internal PriorityQueueNode<SchedulerEntry> UpdateSchedulerNode;
 
         protected bool ScriptHasProperty(string propertyName)
         {
@@ -205,35 +131,6 @@ namespace Stride.Engine
                 return ((IDictionary<string, object>)scriptObj).ContainsKey(propertyName);
             return scriptObj.GetType().GetProperty(propertyName) != null;
         }
-
-        [DataMemberIgnore]
-        internal MicroThread MicroThread;
-
-        [DataMemberIgnore]
-        internal CancellationTokenSource CancellationTokenSource;
-
-        /// <summary>
-        /// Gets a token indicating if the script execution was canceled.
-        /// </summary>
-        public CancellationToken CancellationToken => MicroThread.CancellationToken;
-
-
-        /// <summary>
-        /// Called once, as a microthread
-        /// </summary>
-        /// <returns></returns>
-        //public Task Execute()
-        //{
-
-        //}
-
-        /// <summary>
-        /// Internal helper function called when <see cref="Priority"/> is changed.
-        /// </summary>
-        protected internal virtual void PriorityUpdated()
-        {
-        }
-
 
     }
 }

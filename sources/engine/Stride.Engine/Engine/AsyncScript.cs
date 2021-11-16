@@ -34,6 +34,7 @@ namespace Stride.Engine
         {
             base.PriorityUpdated();
 
+            
             // Update micro thread priority
             if (MicroThread != null)
                 MicroThread.Priority = Priority;

@@ -20,55 +20,22 @@ using Stride.Streaming;
 
 namespace Stride.Engine
 {
-    /// <summary>
-    /// Script component.
-    /// </summary>
-    [DataContract("ScriptComponent", Inherited = true)]
-    [DefaultEntityComponentProcessor(typeof(ScriptProcessor), ExecutionMode = ExecutionMode.Runtime)]
-    [Display(Expand = ExpandRule.Once)]
-    [AllowMultipleComponents]
-    [ComponentOrder(1000)]
-    [ComponentCategory("Scripts")]
-    public abstract class ScriptComponent : EntityComponent, ICollectorHolder,IScriptComponent
+    public abstract class BaseScriptComponent: EntityComponent, ICollectorHolder
     {
         public const uint LiveScriptingMask = 128;
 
-        /// <summary>
-        /// The global profiling key for scripts. Activate/deactivate this key to activate/deactivate profiling for all your scripts.
-        /// </summary>
-        public static readonly ProfilingKey ScriptGlobalProfilingKey = new ProfilingKey("Script");
+       
 
-        private static readonly Dictionary<Type, ProfilingKey> ScriptToProfilingKey = new Dictionary<Type, ProfilingKey>();
-
-        private ProfilingKey profilingKey;
+        protected ProfilingKey profilingKey;
 
         private IGraphicsDeviceService graphicsDeviceService;
         private Logger logger;
 
-        protected ScriptComponent()
+        protected BaseScriptComponent()
         {
         }
 
-        //internal void Initialize(IServiceRegistry registry)
-        //{
-        //    Services = registry;
-
-        //    graphicsDeviceService = Services.GetSafeServiceAs<IGraphicsDeviceService>();
-
-        //    Game = Services.GetSafeServiceAs<IGame>();
-        //    Content = (ContentManager)Services.GetSafeServiceAs<IContentManager>();
-        //    Input = Services.GetSafeServiceAs<InputManager>();
-        //    Script = Services.GetSafeServiceAs<ScriptSystem>();
-        //    SceneSystem = Services.GetSafeServiceAs<SceneSystem>();
-        //    EffectSystem = Services.GetSafeServiceAs<EffectSystem>();
-        //    Audio = Services.GetSafeServiceAs<AudioSystem>();
-        //    SpriteAnimation = Services.GetSafeServiceAs<SpriteAnimationSystem>();
-        //    GameProfiler = Services.GetSafeServiceAs<GameProfilingSystem>();
-        //    DebugText = Services.GetSafeServiceAs<DebugTextSystem>();
-        //    Streaming = Services.GetSafeServiceAs<StreamingManager>();
-        //}
-
-        void IScriptComponent.Initialize(IServiceRegistry registry)
+        internal virtual void Initialize(IServiceRegistry registry)
         {
             Services = registry;
 
@@ -87,27 +54,31 @@ namespace Stride.Engine
             Streaming = Services.GetSafeServiceAs<StreamingManager>();
         }
 
+        //void IScriptComponent.Initialize(IServiceRegistry registry)
+        //{
+        //    Services = registry;
+
+        //    graphicsDeviceService = Services.GetSafeServiceAs<IGraphicsDeviceService>();
+
+        //    Game = Services.GetSafeServiceAs<IGame>();
+        //    Content = (ContentManager)Services.GetSafeServiceAs<IContentManager>();
+        //    Input = Services.GetSafeServiceAs<InputManager>();
+        //    Script = Services.GetSafeServiceAs<ScriptSystem>();
+        //    SceneSystem = Services.GetSafeServiceAs<SceneSystem>();
+        //    EffectSystem = Services.GetSafeServiceAs<EffectSystem>();
+        //    Audio = Services.GetSafeServiceAs<AudioSystem>();
+        //    SpriteAnimation = Services.GetSafeServiceAs<SpriteAnimationSystem>();
+        //    GameProfiler = Services.GetSafeServiceAs<GameProfilingSystem>();
+        //    DebugText = Services.GetSafeServiceAs<DebugTextSystem>();
+        //    Streaming = Services.GetSafeServiceAs<StreamingManager>();
+        //}
+
         /// <summary>
         /// Gets the profiling key to activate/deactivate profiling for the current script class.
         /// </summary>
         [DataMemberIgnore]
-        public ProfilingKey ProfilingKey
-        {
-            get
-            {
-                if (profilingKey != null)
-                    return profilingKey;
-
-                var scriptType = GetType();
-                if (!ScriptToProfilingKey.TryGetValue(scriptType, out profilingKey))
-                {
-                    profilingKey = new ProfilingKey(ScriptGlobalProfilingKey, scriptType.FullName);
-                    ScriptToProfilingKey[scriptType] = profilingKey;
-                }
-
-                return profilingKey;
-            }
-        }
+        public abstract ProfilingKey ProfilingKey { get; }
+        
 
         [DataMemberIgnore]
         public AudioSystem Audio { get; private set; }
@@ -182,10 +153,11 @@ namespace Stride.Engine
             set { priority = value; PriorityUpdated(); }
         }
 
+
         /// <summary>
         /// Determines whether the script is currently undergoing live reloading.
         /// </summary>
-         bool IScriptComponent.IsLiveReloading { get;  set; }
+        public bool IsLiveReloading { get; set; }
 
         /// <summary>
         /// The object collector associated with this script.
@@ -199,6 +171,7 @@ namespace Stride.Engine
                 return collector;
             }
         }
+
 
 
         private ObjectCollector collector;
@@ -218,6 +191,46 @@ namespace Stride.Engine
             collector.Dispose();
         }
 
-        
+    }
+    /// <summary>
+    /// Script component.
+    /// </summary>
+    [DataContract("ScriptComponent", Inherited = true)]
+    [DefaultEntityComponentProcessor(typeof(ScriptProcessor), ExecutionMode = ExecutionMode.Runtime)]
+    [Display(Expand = ExpandRule.Once)]
+    [AllowMultipleComponents]
+    [ComponentOrder(1000)]
+    [ComponentCategory("Scripts")]
+    public abstract class ScriptComponent : BaseScriptComponent
+    {
+
+        /// <summary>
+        /// The global profiling key for scripts. Activate/deactivate this key to activate/deactivate profiling for all your scripts.
+        /// </summary>
+        public static readonly ProfilingKey ScriptGlobalProfilingKey = new ProfilingKey("Script");
+
+        private static readonly Dictionary<Type, ProfilingKey> ScriptToProfilingKey = new Dictionary<Type, ProfilingKey>();
+
+        /// <summary>
+        /// Gets the profiling key to activate/deactivate profiling for the current script class.
+        /// </summary>
+        [DataMemberIgnore]
+        public override ProfilingKey ProfilingKey
+        {
+            get
+            {
+                if (profilingKey != null)
+                    return profilingKey;
+
+                var scriptType = GetType();
+                if (!ScriptToProfilingKey.TryGetValue(scriptType, out profilingKey))
+                {
+                    profilingKey = new ProfilingKey(ScriptGlobalProfilingKey, scriptType.FullName);
+                    ScriptToProfilingKey[scriptType] = profilingKey;
+                }
+
+                return profilingKey;
+            }
+        }
     }
 }

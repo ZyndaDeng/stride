@@ -10,24 +10,16 @@ using Stride.Core.MicroThreading;
 
 namespace Stride.Engine
 {
-    public interface IScriptComponent
-    {
-        int Priority { get;  }
-        ProfilingKey ProfilingKey { get;  }
-        bool IsLiveReloading { get; internal set; }
-       internal  void Initialize(IServiceRegistry registry);
-        void Cancel();
-    }
 
-    public interface IStartupScript: IScriptComponent
+     interface IStartupScript
     {
-        internal PriorityQueueNode<SchedulerEntry> StartSchedulerNode { get; set; }
+         PriorityQueueNode<SchedulerEntry> StartSchedulerNode { get; set; }
         void Start();
     }
 
-    public interface ISyncScript:IStartupScript
+     interface ISyncScript:IStartupScript
     {
-        internal PriorityQueueNode<SchedulerEntry> UpdateSchedulerNode { get; set; }
+         PriorityQueueNode<SchedulerEntry> UpdateSchedulerNode { get; set; }
         bool ShouldUpdate { get; }
         void Update();
     }
