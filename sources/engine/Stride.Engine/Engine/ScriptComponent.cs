@@ -157,7 +157,7 @@ namespace Stride.Engine
         /// <summary>
         /// Determines whether the script is currently undergoing live reloading.
         /// </summary>
-        public bool IsLiveReloading { get; set; }
+        public bool IsLiveReloading { get;internal set; }
 
         /// <summary>
         /// The object collector associated with this script.

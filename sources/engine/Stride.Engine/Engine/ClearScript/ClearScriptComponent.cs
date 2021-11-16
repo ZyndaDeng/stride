@@ -56,7 +56,7 @@ namespace Stride.Engine
             try
             {
                 var Services = registry;
-                ScriptVM = Services.GetSafeServiceAs<IClearScriptVM>();
+                ScriptVM = Services.GetSafeServiceAs<ClearScriptVM>();
                 scriptObj = ScriptVM.createComponentScript(scriptCtorName);
 
                 dynamic args = new
@@ -119,8 +119,7 @@ namespace Stride.Engine
         /// </summary>
         public override void Cancel()
         {
-
-            scriptObj.Cancel();
+            scriptObj?.Cancel();
             base.Cancel();
         }
 
