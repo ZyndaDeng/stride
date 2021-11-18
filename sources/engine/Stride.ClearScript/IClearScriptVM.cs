@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Microsoft.ClearScript;
 
 namespace Stride.ClearScript
 {
@@ -11,8 +11,9 @@ namespace Stride.ClearScript
     {
         object Evaluate(string code);
         object createComponentScript(string name);
-        Task loadSrc(string path);
-        Task loadFile(string fileName);
+        void loadSrc(string path);
+        void loadFile(string fileName, bool isModule);
+        void addType(string typeName, Type type);
         //object CreatePromiseForTask<T>(Task<T> task);
         //object CreatePromiseForTask(Task task);
 

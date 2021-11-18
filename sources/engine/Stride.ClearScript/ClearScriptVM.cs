@@ -34,6 +34,11 @@ namespace Stride.ClearScript
             engine.AddHostType("MSConsole", typeof(Console));
         }
 
+        public void addType(string typeName,Type type)
+        {
+            engine.AddHostType(typeName, type);
+        }
+
 
         public object Evaluate(string code)
         {
@@ -44,7 +49,7 @@ namespace Stride.ClearScript
         {
             try
             {
-                var ret = Evaluate("new __Stride.Components." + name + ".ctor()");
+                var ret = Evaluate("new __stride.Components." + name + ".ctor()");
                 return ret;
             }catch(Exception e)
             {
@@ -52,28 +57,28 @@ namespace Stride.ClearScript
             }
         }
 
-        public async Task loadSrc(string path)
+        public void loadSrc(string path)
         {
             var scriptFiles = VirtualFileSystem.ListFiles(path, "*" + engine.DocumentSettings.FileNameExtensions, VirtualSearchOption.AllDirectories).Result;
             foreach(var file in scriptFiles)
             {
-               await loadFile(file);
+                loadFile(file,true);
             }
 
         }
 
-        public async Task loadFile(string fileName)
+        public void loadFile(string fileName, bool isModule)
         {
             using var stream = VirtualFileSystem.OpenStream(fileName, VirtualFileMode.Open, VirtualFileAccess.Read);
             using var streamReader = new StreamReader(stream);
             //read the raw asset content
             try
             {
-                string source = await streamReader.ReadToEndAsync();
+                string source =  streamReader.ReadToEnd();
                 var path = Path.GetDirectoryName(fileName) + Path.DirectorySeparatorChar;
                 var doc = new DocumentInfo(new Uri(@"\\js" + path));
 
-                doc.Category = ModuleCategory.Standard;
+                doc.Category = isModule ? ModuleCategory.Standard : DocumentCategory.Script;
                 var script = engine.Evaluate(doc, source);
                 // Console.WriteLine("------javascript c={0}", script.c);
             }

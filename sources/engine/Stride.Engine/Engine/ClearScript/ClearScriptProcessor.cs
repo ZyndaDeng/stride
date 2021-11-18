@@ -30,12 +30,11 @@ namespace Stride.Engine.ClearScript
                 var gameSystems = Services.GetSafeServiceAs<IGameSystemCollection>();
                 Services.AddService(clearScriptVM);
                 gameSystems.Add(clearScriptVM);
-                //clearScriptVM.loadFile("/roaming/src/bundle.js").ContinueWith((t) =>
-                //{
-                //    clearScriptVM.loadSrc("/roaming/src/components/");
-                //});
-                
-                 
+                clearScriptVM.addType("Entity", typeof(Entity));
+                clearScriptVM.loadFile("/roaming/src/bundle.js", false); 
+                clearScriptVM.loadSrc("/roaming/src/components/");
+
+
             }
         }
 

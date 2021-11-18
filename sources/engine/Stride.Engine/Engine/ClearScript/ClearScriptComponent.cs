@@ -126,9 +126,10 @@ namespace Stride.Engine
 
         protected bool ScriptHasProperty(string propertyName)
         {
-            if (scriptObj is ExpandoObject)
-                return ((IDictionary<string, object>)scriptObj).ContainsKey(propertyName);
-            return scriptObj.GetType().GetProperty(propertyName) != null;
+            return true;
+            //if (scriptObj is ExpandoObject)
+            //    return ((IDictionary<string, object>)scriptObj).ContainsKey(propertyName);
+            //return scriptObj.GetType().GetProperty(propertyName) != null;
         }
 
     }
