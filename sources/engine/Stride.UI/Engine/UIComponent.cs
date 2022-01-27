@@ -110,7 +110,8 @@ namespace Stride.Engine
         [DataMember(70)]
         [Display("Fixed Size")]
         [DefaultValue(false)]
-        public bool IsFixedSize { get; set; } = false;
+        public bool IsFixedSize { get; 
+            set; } = false;
 
         /// <summary>
         /// The render group for this component.
